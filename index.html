@@ -132,7 +132,8 @@
     </p>
   </div>
 </div>
-<audio id="bgMusic" loop>
+
+<audio id="bgMusic" loop preload="auto">
   <source src="cura.mp3" type="audio/mpeg">
 </audio>
 
@@ -155,31 +156,33 @@ Talvez eu precise fazer o que você sempre quis: dar um passo pra trás, parar d
 
 E independente de qualquer coisa… obrigado por tudo eu te amo.`;
 
-
 const envelope = document.getElementById('envelope');
 const modal = document.getElementById('modal');
 const closeBtn = document.getElementById('closeBtn');
 const hint = document.getElementById('clickHint');
 const output = document.getElementById("letterText");
+const music = document.getElementById("bgMusic");
+
+music.volume = 0.2;
 
 let i = 0;
+let opened = false;
 
 function typeWriter() {
   if (i < text.length) {
     const char = text.charAt(i);
-
-    if (char === "\n") {
-      output.innerHTML += "<br><br>";
-    } else {
-      output.innerHTML += char;
-    }
-
+    output.innerHTML += char === "\n" ? "<br><br>" : char;
     i++;
     setTimeout(typeWriter, 20);
   }
 }
 
-envelope.onclick = () => {
+envelope.addEventListener("click", () => {
+  if (opened) return;
+  opened = true;
+
+  music.play().catch(() => {});
+
   envelope.classList.add('open');
   hint.style.opacity = 0;
 
@@ -187,7 +190,7 @@ envelope.onclick = () => {
     modal.style.display = 'flex';
     typeWriter();
   }, 800);
-};
+});
 
 function reset() {
   modal.style.display = 'none';
@@ -195,21 +198,17 @@ function reset() {
   hint.style.opacity = 1;
   output.innerHTML = "";
   i = 0;
+  opened = false;
+
+  music.pause();
+  music.currentTime = 0;
 }
 
 closeBtn.onclick = reset;
+
 modal.onclick = (e) => {
   if (e.target === modal) reset();
 };
-const music = document.getElementById("bgMusic");
-music.volume = 0.2; // volume baixo
-
-setTimeout(() => {
-  modal.style.display = 'flex';
-  typeWriter();
-  music.play();
-}, 800);
-
 </script>
 
 </body>
