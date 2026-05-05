@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para Você</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&family=Dancing+Script&display=swap');
+
+    body {
+      background: linear-gradient(270deg, #dbeafe, #bfdbfe, #93c5fd);
+      background-size: 600% 600%;
+      animation: gradientMove 12s ease infinite;
+      font-family: 'Playfair Display', serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .envelope {
+      width: 380px;
+      height: 260px;
+      background: #2563eb;
+      position: relative;
+      cursor: pointer;
+      border-radius: 12px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      50% { transform: translateY(-10px); }
+    }
+
+    .flap {
+      position: absolute;
+      width: 100%;
+      height: 55%;
+      background: #1e40af;
+      clip-path: polygon(0% 0%, 50% 68%, 100% 0%);
+      transition: 1.4s;
+    }
+
+    .envelope.open .flap {
+      transform: rotateX(-165deg);
+    }
+
+    .seal {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 78px;
+      height: 78px;
+      background: #facc15;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 0 20px rgba(250,204,21,0.8);
+    }
+
+    .modal {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .letter-box {
+      background: white;
+      padding: 40px;
+      max-width: 600px;
+      border-radius: 16px;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.4rem;
+      color: #1e40af;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="text-center">
+  <h1 class="text-5xl mb-10 text-blue-900" style="font-family: 'Dancing Script', cursive;">
+    Para a menina que eu amo
+  </h1>
+
+  <div id="envelope" class="envelope mx-auto">
+    <div class="flap"></div>
+    <div class="seal">❤️</div>
+  </div>
+
+  <p id="clickHint" class="mt-6 text-blue-800 text-sm">
+    CLIQUE NO ENVELOPE
+  </p>
+</div>
+
+<div id="modal" class="modal">
+  <div class="letter-box">
+    <div class="close-btn" id="closeBtn">×</div>
+
+    <p class="text-center text-3xl mb-6">Minha Pretinha,</p>
+    <p id="letterText"></p>
+
+    <p class="mt-10 text-right text-xl">
+      Com todo meu amor,<br>Paravidino
+    </p>
+  </div>
+</div>
+<audio id="bgMusic" loop>
+  <source src="cura.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const text = `Faço essa carta com o coração apertado. Escrevi ela ao longo da semana, depois do nosso último domingo juntos, e provavelmente mudei muita coisa até chegar nessa versão que você está lendo agora.
+
+Antes de tudo, eu só tenho a te agradecer por tudo que a gente viveu. Eu não me arrependo de nada. De verdade. Você sempre vai ter um lugar especial no meu coração, independente de qualquer coisa. Porque o que eu sinto por você não é só de forma romântica, mas também como amigo e ter você na minha vida sempre foi algo muito importante pra mim.
+
+Mas também escrevo isso com o coração pesado… porque, se você está lendo, talvez as coisas não tenham acontecido como eu esperava.
+
+E tudo bem. De verdade. Você nunca teve culpa de nada. Quem criou expectativas fui eu. Você sempre foi clara do seu jeito, e mesmo assim eu acabei me deixando sentir cada vez mais… até um ponto em que começou a doer.
+
+É difícil aceitar que talvez eu nunca seja o amor da sua vida, porque, sendo sincero, era isso que eu queria ser. Não só porque eu te amo, mas porque eu queria te ver feliz e na minha cabeça, eu poderia ser parte disso.
+
+Você apareceu na minha vida quando eu não estava procurando nada. No começo era leve, sem intenção, só momentos bons… e, de alguma forma, tudo foi crescendo até eu me ver dizendo que te amo. E, pensando bem, é até estranho como isso aconteceu  mas aconteceu.
+
+Eu só quero, de verdade, que você seja feliz. Mesmo que não seja comigo.
+
+Talvez eu precise fazer o que você sempre quis: dar um passo pra trás, parar de insistir e seguir meu caminho. Não porque eu deixei de sentir, mas porque às vezes gostar também é saber a hora de ir. Isso não é uma carta de despedida você vai continuar sendo uma das minhas melhores amigas, voce acaba me conhecendo melhor do que ngm agora kkkkkk nunca vou te afastar e não quero que me afaste tambem.
+
+E independente de qualquer coisa… obrigado por tudo eu te amo.`;
+
+
+const envelope = document.getElementById('envelope');
+const modal = document.getElementById('modal');
+const closeBtn = document.getElementById('closeBtn');
+const hint = document.getElementById('clickHint');
+const output = document.getElementById("letterText");
+
+let i = 0;
+
+function typeWriter() {
+  if (i < text.length) {
+    const char = text.charAt(i);
+
+    if (char === "\n") {
+      output.innerHTML += "<br><br>";
+    } else {
+      output.innerHTML += char;
+    }
+
+    i++;
+    setTimeout(typeWriter, 20);
+  }
+}
+
+envelope.onclick = () => {
+  envelope.classList.add('open');
+  hint.style.opacity = 0;
+
+  setTimeout(() => {
+    modal.style.display = 'flex';
+    typeWriter();
+  }, 800);
+};
+
+function reset() {
+  modal.style.display = 'none';
+  envelope.classList.remove('open');
+  hint.style.opacity = 1;
+  output.innerHTML = "";
+  i = 0;
+}
+
+closeBtn.onclick = reset;
+modal.onclick = (e) => {
+  if (e.target === modal) reset();
+};
+const music = document.getElementById("bgMusic");
+music.volume = 0.2; // volume baixo
+
+setTimeout(() => {
+  modal.style.display = 'flex';
+  typeWriter();
+  music.play();
+}, 800);
+
+</script>
+
+</body>
+</html>
